@@ -1,0 +1,108 @@
+services:
+  - type: web
+    name: spring-postgres-redis-dockerfile
+    runtime: docker
+    region: frankfurt
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: redis-cache
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: redis-cache
+          property: port
+      - key: SPRING_DATASOURCE_CONNECTION_STRING
+        fromDatabase:
+          name: elephant
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: elephant
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: elephant
+          property: password
+      - key: SPRING_DATASOURCE_HOST
+        fromDatabase:
+          name: elephant
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: elephant
+          property: port
+      - key: SPRING_DATASOURCE_SCHEMA
+        fromDatabase:
+          name: elephant
+          property: database
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_SCHEMA}
+
+  - type: web
+    name: spring-postgres-redis-image
+    runtime: image
+    image:
+      url: ghcr.io/kanezi/render-boot-postgres-redis-example:latest
+    region: frankfurt
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: redis-cache
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: redis-cache
+          property: port
+      - key: SPRING_DATASOURCE_CONNECTION_STRING
+        fromDatabase:
+          name: elephant
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: elephant
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: elephant
+          property: password
+      - key: SPRING_DATASOURCE_HOST
+        fromDatabase:
+          name: elephant
+          property: host
+      - key: SPRING_DATASOURCE_PORT
+        fromDatabase:
+          name: elephant
+          property: port
+      - key: SPRING_DATASOURCE_SCHEMA
+        fromDatabase:
+          name: elephant
+          property: database
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_SCHEMA}
+
+
+  # A Redis instance
+  - type: redis
+    name: redis-cache
+    region: frankfurt
+    ipAllowList: # required
+      - source: 0.0.0.0/0
+        description: everywhere
+    plan: free # optional (defaults to starter instance type)
+
+
+
+databases:
+  - name: elephant
+    region: frankfurt
+    plan: free
+
